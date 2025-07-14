@@ -2,9 +2,12 @@ import re
 import numpy as np
 from textblob import TextBlob
 import json
+from models import CustomerProfile
+from extensions import db
 
 class EmotionAwareRecommendation:
-    def __init__(self):
+    def __init__(self, db):
+        self.db = db
         # Product categories mapped to emotions
         self.emotion_product_mapping = {
             'happy': ['electronics', 'games', 'books', 'sports'],
@@ -14,8 +17,7 @@ class EmotionAwareRecommendation:
             'angry': ['stress_relief', 'books', 'music', 'exercise'],
             'neutral': ['essentials', 'home', 'clothing', 'food']
         }
-        
-        # Sample products database
+        # Sample products database (still hardcoded)
         self.products = {
             'electronics': [
                 {'id': 1, 'name': 'Smartphone', 'price': 299, 'rating': 4.5},

@@ -1,18 +1,36 @@
+import os
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
+from extensions import db
 from dock_scheduler import DockScheduler
 from fulfillment_engine import FulfillmentEngine
 from carbon_calculator import CarbonCalculator
 from recommendation_engine import EmotionAwareRecommendation
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+
+db_uri = os.environ.get('DATABASE_URL')
+if not db_uri:
+    raise RuntimeError("DATABASE_URL environment variable not set! Please set it in your environment or .env file.")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+db.init_app(app)
+
+# Import models after db is initialized
+def import_models():
+    global Warehouse, DockSchedule, InventoryItem, DeliveryRoute, CustomerProfile, WeatherData
+    from models import Warehouse, DockSchedule, InventoryItem, DeliveryRoute, CustomerProfile, WeatherData
+import_models()
 
 # Initialize components
-dock_scheduler = DockScheduler()
-fulfillment_engine = FulfillmentEngine()
+dock_scheduler = DockScheduler(db)
+fulfillment_engine = FulfillmentEngine(db)
 carbon_calculator = CarbonCalculator()
-recommendation_engine = EmotionAwareRecommendation()
+recommendation_engine = EmotionAwareRecommendation(db)
 
 @app.route('/')
 def dashboard():
@@ -62,5 +80,5 @@ def api_product_recommendation():
         'emotion_detected': result['emotion_detected']
     })
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

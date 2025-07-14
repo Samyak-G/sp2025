@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+from models import DockSchedule, InventoryItem, Warehouse
+from extensions import db
 
 class DockScheduler:
-    def __init__(self):
+    def __init__(self, db):
+        self.db = db
         self.dock_capacity = 10
         self.time_slots = self.generate_time_slots()
         self.scheduled_trucks = []
@@ -42,23 +45,31 @@ class DockScheduler:
         return base_time
     
     def schedule_truck(self, truck_data):
-        """Schedule truck to optimal dock and time slot"""
-        predicted_time = self.predict_unload_time(truck_data)
-        
-        # Find best available slot
-        for i, slot in enumerate(self.time_slots):
-            if slot['available_docks'] > 0:
-                # Assign truck to this slot
-                self.time_slots[i]['available_docks'] -= 1
-                
-                return {
-                    'dock_number': f"Dock {self.dock_capacity - slot['available_docks'] + 1}",
-                    'time_slot': f"{slot['start']}-{slot['end']}",
-                    'predicted_unload_time': predicted_time,
-                    'status': 'scheduled'
-                }
-        
-        return {'status': 'no_slots_available'}
+        # Find a warehouse (for demo, use the first one)
+        warehouse = Warehouse.query.first()
+        if not warehouse:
+            return {'status': 'no_warehouse_available'}
+        # Find next available dock number
+        dock_number = 1
+        scheduled_time = datetime.now()
+        # Create a new dock schedule
+        dock_schedule = DockSchedule(
+            warehouse_id=warehouse.id,
+            truck_id=truck_data.get('truck_id'),
+            dock_number=dock_number,
+            scheduled_time=scheduled_time,
+            estimated_duration=30,
+            status='scheduled',
+            cargo_type=truck_data.get('cargo_type'),
+            truck_size=truck_data.get('size')
+        )
+        self.db.session.add(dock_schedule)
+        self.db.session.commit()
+        return {
+            'dock_assignment': dock_number,
+            'time_slot': scheduled_time.strftime('%H:%M'),
+            'status': 'scheduled'
+        }
     
     def generate_heatmap_data(self):
         """Generate heatmap data for warehouse optimization"""

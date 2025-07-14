@@ -32,10 +32,10 @@ if missing:
 
 SCHEMA_SQL = """
 -- 1. Create a custom schema for organization (optional, but recommended)
-CREATE SCHEMA IF NOT EXISTS walmart;
+CREATE SCHEMA IF NOT EXISTS smartflow;
 
 -- 2. Warehouses table
-CREATE TABLE IF NOT EXISTS walmart.warehouse (
+CREATE TABLE IF NOT EXISTS smartflow.warehouse (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     location VARCHAR(100) NOT NULL,
@@ -45,9 +45,9 @@ CREATE TABLE IF NOT EXISTS walmart.warehouse (
 );
 
 -- 3. Dock Scheduling table
-CREATE TABLE IF NOT EXISTS walmart.dock_schedule (
+CREATE TABLE IF NOT EXISTS smartflow.dock_schedule (
     id SERIAL PRIMARY KEY,
-    warehouse_id INTEGER NOT NULL REFERENCES walmart.warehouse(id) ON DELETE CASCADE,
+    warehouse_id INTEGER NOT NULL REFERENCES smartflow.warehouse(id) ON DELETE CASCADE,
     truck_id VARCHAR(50) NOT NULL,
     dock_number INTEGER NOT NULL,
     scheduled_time TIMESTAMP NOT NULL,
@@ -59,9 +59,9 @@ CREATE TABLE IF NOT EXISTS walmart.dock_schedule (
 );
 
 -- 4. Inventory table
-CREATE TABLE IF NOT EXISTS walmart.inventory_item (
+CREATE TABLE IF NOT EXISTS smartflow.inventory_item (
     id SERIAL PRIMARY KEY,
-    warehouse_id INTEGER NOT NULL REFERENCES walmart.warehouse(id) ON DELETE CASCADE,
+    warehouse_id INTEGER NOT NULL REFERENCES smartflow.warehouse(id) ON DELETE CASCADE,
     product_id VARCHAR(50) NOT NULL,
     product_name VARCHAR(200) NOT NULL,
     quantity INTEGER NOT NULL,
@@ -72,10 +72,10 @@ CREATE TABLE IF NOT EXISTS walmart.inventory_item (
 );
 
 -- 5. Delivery Route table
-CREATE TABLE IF NOT EXISTS walmart.delivery_route (
+CREATE TABLE IF NOT EXISTS smartflow.delivery_route (
     id SERIAL PRIMARY KEY,
     order_id VARCHAR(50) NOT NULL,
-    source_warehouse_id INTEGER REFERENCES walmart.warehouse(id) ON DELETE SET NULL,
+    source_warehouse_id INTEGER REFERENCES smartflow.warehouse(id) ON DELETE SET NULL,
     destination_address TEXT NOT NULL,
     destination_lat DOUBLE PRECISION,
     destination_lng DOUBLE PRECISION,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS walmart.delivery_route (
 );
 
 -- 6. Customer Profile table
-CREATE TABLE IF NOT EXISTS walmart.customer_profile (
+CREATE TABLE IF NOT EXISTS smartflow.customer_profile (
     id SERIAL PRIMARY KEY,
     customer_id VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(100),
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS walmart.customer_profile (
 );
 
 -- 7. (Optional) Weather Data table for external API results caching
-CREATE TABLE IF NOT EXISTS walmart.weather_data (
+CREATE TABLE IF NOT EXISTS smartflow.weather_data (
     id SERIAL PRIMARY KEY,
     location VARCHAR(100) NOT NULL,
     latitude DOUBLE PRECISION,
