@@ -1,0 +1,27 @@
+.feature-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.status-active { 
+    background-color: #28a745; 
+}
+
+.status-warning { 
+    background-color: #ffc107; 
+}
+
+.status-error { 
+    background-color: #dc3545; 
+}

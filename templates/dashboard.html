@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFlow - AI-Powered Walmart Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .feature-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-active { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; }
+        .status-error { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">SmartFlow</a>
+            <span class="navbar-text">AI-Powered Walmart Management System</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- AI Dock Scheduler -->
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h5><span class="status-indicator status-active"></span>AI Dock & Inventory Scheduler</h5>
+                    <p>Optimize dock scheduling and inventory placement</p>
+                    <button class="btn btn-primary" onclick="testDockScheduler()">Schedule Truck</button>
+                    <button class="btn btn-secondary" onclick="showHeatmap()">View Heatmap</button>
+                    <div id="dock-results" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Fulfillment Engine -->
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h5><span class="status-indicator status-active"></span>Geo-Intelligent Fulfillment</h5>
+                    <p>Select optimal warehouse and delivery routes</p>
+                    <button class="btn btn-primary" onclick="testFulfillment()">Find Best Warehouse</button>
+                    <div id="fulfillment-results" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Carbon Calculator -->
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h5><span class="status-indicator status-active"></span>Carbon Footprint Estimator</h5>
+                    <p>Calculate and optimize delivery emissions</p>
+                    <button class="btn btn-primary" onclick="testCarbonCalculator()">Calculate Emissions</button>
+                    <div id="carbon-results" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Recommendation Engine -->
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h5><span class="status-indicator status-active"></span>Emotion-Aware Recommendations</h5>
+                    <p>AI-powered product recommendations</p>
+                    <input type="text" id="user-input" class="form-control mb-2" placeholder="Enter your message...">
+                    <button class="btn btn-primary" onclick="getRecommendations()">Get Recommendations</button>
+                    <div id="recommendation-results" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="feature-card">
+                    <h5>System Analytics</h5>
+                    <canvas id="analyticsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test functions for each component
+        function testDockScheduler() {
+            const testData = {
+                truck_id: 'TRK001',
+                size: 'large',
+                cargo_type: 'general',
+                arrival_time: '14:30'
+            };
+
+            fetch('/api/dock-scheduler', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('dock-results').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>Scheduled!</strong><br>
+                        Dock: ${data.dock_assignment}<br>
+                        Time: ${data.time_slot}
+                    </div>
+                `;
+            });
+        }
+
+        function testFulfillment() {
+            const testData = {
+                customer_location: 'Mumbai',
+                order_items: ['electronics', 'books'],
+                priority: 'standard'
+            };
+
+            fetch('/api/fulfillment-engine', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('fulfillment-results').innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>Optimal Warehouse:</strong> ${data.warehouse}<br>
+                        <strong>Delivery Time:</strong> ${data.estimated_delivery}
+                    </div>
+                `;
+            });
+        }
+
+        function testCarbonCalculator() {
+            const testData = {
+                distance: 25,
+                vehicle_type: 'truck',
+                delivery_type: 'standard'
+            };
+
+            fetch('/api/carbon-calculator', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('carbon-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>Carbon Footprint:</strong> ${data.carbon_footprint}<br>
+                        <strong>Eco-friendly options:</strong> ${data.eco_friendly_options ? 'Available' : 'Not Available'}
+                    </div>
+                `;
+            });
+        }
+
+        function getRecommendations() {
+            const userInput = document.getElementById('user-input').value;
+            const testData = {
+                user_input: userInput,
+                user_data: {
+                    age: 28,
+                    location: 'Mumbai',
+                    income_level: 'middle'
+                }
+            };
+
+            fetch('/api/product-recommendation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('recommendation-results').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>Recommendations:</strong><br>
+                        ${data.recommendations.map(item => `• ${item}`).join('<br>')}
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize analytics chart
+        const ctx = document.getElementById('analyticsChart').getContext('2d');
+        const analyticsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Dock Efficiency',
+                    data: [65, 72, 78, 85, 82, 90],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }, {
+                    label: 'Carbon Reduction',
+                    data: [20, 25, 30, 35, 40, 45],
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
